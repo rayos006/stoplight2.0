@@ -45,6 +45,7 @@ void loop(){
   unsigned long curr_time = millis();
   server.handleClient();
   if(CYCLE){
+    //Check if light is off or yellow
     if(strcmp(LED,"off") == 0 || strcmp(LED,"yellow") == 0){
       if (curr_time - PREV_TIME >= SHORT_PERIOD) {
         red();
@@ -52,6 +53,7 @@ void loop(){
         PREV_TIME = curr_time;
       }
     }
+    // Check if light is Red
     else if(strcmp(LED,"red") == 0){
       if (curr_time - PREV_TIME >= LONG_PERIOD) {
         green();
@@ -59,6 +61,7 @@ void loop(){
         PREV_TIME = curr_time;
       }
     }
+    //Check if light is green
     else if(strcmp(LED,"green") == 0){
       
       if (curr_time - PREV_TIME >= LONG_PERIOD) {
@@ -69,7 +72,7 @@ void loop(){
     }
   }
 }
-
+// Turns off the cycle and all leds
 void off()
 {
   CYCLE = false;
@@ -80,7 +83,7 @@ void off()
   strcpy(LED, "off");
   return_html();
 }
-
+// Turns on the red LED
 void red()
 {
   digitalWrite(D2, false);
@@ -89,7 +92,7 @@ void red()
   Serial.println("RED ON");
   strcpy(LED, "red");
 }
-
+// Turns on the yellow LED
 void yellow()
 {
   digitalWrite(D1, false);
@@ -98,7 +101,7 @@ void yellow()
   Serial.println("YELLOW ON");
   strcpy(LED, "yellow");
 }
-
+// Turns on the green LED
 void green(){
   digitalWrite(D1, false);
   digitalWrite(D2, false);
@@ -107,33 +110,36 @@ void green(){
   strcpy(LED, "green");
 }
 
+// Status check for front end
 void status_check(){
   server.send(200, "text/plain", LED);
 }
 
+// Start cycle
 void cycle(){
   CYCLE = true;
   return_html();
 }
 
+// Turns off cycle and turns on the green light
 void green_call(){
   CYCLE = false;
   green();
   return_html();
 }
-
+// Turns off cycle and turns on the red light
 void red_call(){
   CYCLE = false;
   red();
   return_html();
 }
-
+// Turns off cycle and turns on the yellow light
 void yellow_call(){
   CYCLE = false;
   yellow();
   return_html();
 }
-
+// returns the HTML page
 void return_html(){
   server.send(200, "text/html", "<!DOCTYPE html><html><head><script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script></head><header><title>Stoplight</title></header><style>.dot {height: 25px;width: 25px;border-radius: 50%;display: inline-block;}.red {background-color: rgb(169, 9, 9);}.yellow {background-color: rgb(244, 236, 15);}.green {background-color: rgb(10, 121, 20);}.off {background-color: rgb(255, 255, 255);}</style><body><h3>Welcome to the Stoplight!</h3><br /><!-- Buttons to change state manually --><a href='/off'><button>Off</button></a><br /><a href='/red'><button>Red</button></a><br /><a href='/yellow'><button>Yellow</button></a><br /><a href='/green'><button>Green</button></a><br /><!-- Button to start cycle of lights --><a href='/cycle'><button>Run Light</button></a><br /><br /><!-- Current state of light --><script>setInterval(function() {$.ajax({type: 'get',url: '/status',datatype: 'json',success: function(data) {console.log(data);$('#dot').removeClass('green red yellow').addClass(data);}});}, 1000); //time in milliseconds</script><span id='dot' class='dot'></span></body></html>");
 }

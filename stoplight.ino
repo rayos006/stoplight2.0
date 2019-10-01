@@ -5,8 +5,8 @@
 ESP8266WebServer server(80);
 bool CYCLE = false;
 unsigned long PREV_TIME = 0;
-int LONG_PERIOD = 2000;
-int SHORT_PERIOD = 1000;
+const long LONG_PERIOD = 5000;
+const long SHORT_PERIOD = 1000;
 char LED[] = "off";
 
 void setup()
@@ -46,25 +46,25 @@ void loop(){
   server.handleClient();
   if(CYCLE){
     if(strcmp(LED,"off") == 0 || strcmp(LED,"yellow") == 0){
-      if ((unsigned long)(curr_time - PREV_TIME) >= LONG_PERIOD) {
+      if (curr_time - PREV_TIME >= SHORT_PERIOD) {
         red();
         // save the "current" time
-        PREV_TIME = millis();
+        PREV_TIME = curr_time;
       }
     }
-    if(strcmp(LED,"red") == 0){
-      if ((unsigned long)(curr_time - PREV_TIME) >= SHORT_PERIOD) {
+    else if(strcmp(LED,"red") == 0){
+      if (curr_time - PREV_TIME >= LONG_PERIOD) {
         green();
         // save the "current" time
-        PREV_TIME = millis();
+        PREV_TIME = curr_time;
       }
     }
-    if(strcmp(LED,"green") == 0){
+    else if(strcmp(LED,"green") == 0){
       
-      if ((unsigned long)(curr_time - PREV_TIME) >= SHORT_PERIOD) {
+      if (curr_time - PREV_TIME >= LONG_PERIOD) {
         yellow();
         // save the "current" time
-        PREV_TIME = millis();
+        PREV_TIME = curr_time;
       }
     }
   }
